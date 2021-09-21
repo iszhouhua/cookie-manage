@@ -15,5 +15,6 @@
     "48": "/images/icon-48.png",
     "128": "/images/icon-128.png"
   },
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "homepage_url": "https://github.com/iszhouhua/cookie-push"
 }
