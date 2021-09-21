@@ -1,0 +1,19 @@
+{
+  "name": "Cookie推送工具",
+  "description": "获取并推送指定网站的Cookie到服务器",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "permissions": ["storage","contextMenus","tabs","cookies","scripting","notifications"],
+  "host_permissions": ["<all_urls>"],
+  "icons": {
+    "16": "/images/icon-16.png",
+    "32": "/images/icon-32.png",
+    "48": "/images/icon-48.png",
+    "128": "/images/icon-128.png"
+  },
+  "options_page": "options.html"
+}
