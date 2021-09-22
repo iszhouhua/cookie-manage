@@ -77,7 +77,7 @@ let pushCookies = (cookies) => {
         console.log("返回结果", text)
       })
     }, err => {
-      console.error("请求失败", err)
+      console.error("请求失败", err);
       chrome.notifications.create("fail", {
         type: "basic",
         title: "Cookie推送工具",
@@ -111,6 +111,10 @@ chrome.contextMenus.onClicked.addListener(async (itemData) => {
 let lastAutoPushTime
 
 let cookieListener = (changeInfo) => {
+  if (changeInfo.removed) {
+    //过滤删除cookie的操作
+    return
+  }
   chrome.storage.sync.get(['listenerDomain', 'minPushInterval', 'cookieNames'], async (config) => {
     if (changeInfo.cookie.domain.indexOf(config.listenerDomain) == -1) {
       //与监控域名不符，不推送
@@ -133,6 +137,7 @@ let cookieListener = (changeInfo) => {
   });
 }
 
+chrome.cookies.onChanged.addListener(cookieListener)
 chrome.storage.sync.get(['isAutoPush'], (result) => {
   if (result.isAutoPush) {
     chrome.cookies.onChanged.addListener(cookieListener)
