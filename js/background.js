@@ -137,7 +137,6 @@ let cookieListener = (changeInfo) => {
   });
 }
 
-chrome.cookies.onChanged.addListener(cookieListener)
 chrome.storage.sync.get(['isAutoPush'], (result) => {
   if (result.isAutoPush) {
     chrome.cookies.onChanged.addListener(cookieListener)
