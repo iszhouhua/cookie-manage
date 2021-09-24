@@ -9,6 +9,11 @@ chrome.runtime.onInstalled.addListener(() => {
     "title": "推送cookie",
     "contexts": ["page"]
   });
+  chrome.contextMenus.create({
+    "id": "clearCookie",
+    "title": "清除cookie",
+    "contexts": ["page"]
+  });
 });
 
 
@@ -23,6 +28,18 @@ let getCurrentTab = async () => {
 
 let spliceCookies = (cookies) => {
   return cookies.map(c => c.name + '=' + c.value).join('; ')
+}
+
+let copyCookies = (cookies) => {
+  chrome.scripting.executeScript({
+    target: {
+      tabId: tag.id
+    },
+    func: (val) => navigator.clipboard.writeText(val),
+    args: [spliceCookies(cookies)]
+  }, () => {
+    console.log('cookie复制成功')
+  });
 }
 
 let pushCookies = (cookies) => {
@@ -88,23 +105,30 @@ let pushCookies = (cookies) => {
   })
 }
 
+let removeCookies = (cookies, url) => {
+  for (const cookie of cookies) {
+    chrome.cookies.remove({
+      name: cookie.name,
+      url
+    })
+  }
+}
+
 chrome.contextMenus.onClicked.addListener(async (itemData) => {
   let tag = await getCurrentTab();
   let cookies = await chrome.cookies.getAll({
     url: tag.url
   })
-  if (itemData.menuItemId === 'copyCookie') {
-    chrome.scripting.executeScript({
-      target: {
-        tabId: tag.id
-      },
-      func: (val) => navigator.clipboard.writeText(val),
-      args: [spliceCookies(cookies)]
-    }, () => {
-      console.log('cookie复制成功')
-    });
-  } else if (itemData.menuItemId === 'pushCookie') {
-    pushCookies(cookies)
+  switch (itemData.menuItemId) {
+    case 'copyCookie':
+      copyCookies(cookies)
+      break;
+    case 'pushCookie':
+      pushCookies(cookies)
+      break;
+    case 'clearCookie':
+      removeCookies(cookies, tag.url)
+      break;
   }
 });
 
