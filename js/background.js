@@ -30,7 +30,7 @@ let spliceCookies = (cookies) => {
   return cookies.map(c => c.name + '=' + c.value).join('; ')
 }
 
-let copyCookies = (cookies) => {
+let copyCookies = (tag,cookies) => {
   chrome.scripting.executeScript({
     target: {
       tabId: tag.id
@@ -121,7 +121,7 @@ chrome.contextMenus.onClicked.addListener(async (itemData) => {
   })
   switch (itemData.menuItemId) {
     case 'copyCookie':
-      copyCookies(cookies)
+      copyCookies(tag,cookies)
       break;
     case 'pushCookie':
       pushCookies(cookies)
