@@ -8,7 +8,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link rel="stylesheet" href="/vendor/layui/css/layui.css" media="all">
-  <link rel="stylesheet" href="/vendor/inputTag/inputTag.css">
 </head>
 
 <body>
@@ -18,7 +17,7 @@
       <legend>cookie推送配置</legend>
     </fieldset>
 
-    <form class="layui-form" action="" lay-filter="configForm">
+    <form class="layui-form" action="" lay-filter="configForm" id="configForm">
       <div class="layui-form-item">
         <label class="layui-form-label">推送链接</label>
         <div class="layui-input-block">
@@ -31,8 +30,11 @@
         <label class="layui-form-label">请求方法</label>
         <div class="layui-input-block">
           <select name="method">
-            <option value="POST" selected="">POST</option>
+            <option value="GET">GET</option>
+            <option value="POST" selected>POST</option>
             <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="PATCH">PATCH</option>
           </select>
         </div>
       </div>
@@ -40,76 +42,32 @@
       <div class="layui-form-item">
         <label class="layui-form-label">推送字段名</label>
         <div class="layui-input-block">
-          <input type="tel" name="fieldName" lay-verify="required" autocomplete="off" class="layui-input" value="cookie"
+          <input type="text" name="fieldName" id="fieldName" lay-verify="required" autocomplete="off" class="layui-input" value="cookie"
             lay-verType="tips">
         </div>
       </div>
 
       <div class="layui-form-item">
-        <div class="layui-inline">
-          <label class="layui-form-label">推送格式</label>
-          <div class="layui-input-inline">
-            <select name="cookieFormat" lay-filter="cookieFormat">
-              <option value="string" selected>字符串</option>
-              <option value="array">数组</option>
-              <option value="object">JSON对象</option>
-              <option value="jsonArray">JSON数组</option>
-            </select>
-          </div>
-          <div class="layui-form-mid layui-word-aux" id="cookieFormatTip">示例：a=1; b=2</div>
-        </div>
-      </div>
-
-
-      <div class="layui-form-item">
-        <label class="layui-form-label">自动推送</label>
-        <div class="layui-input-inline">
-          <input type="checkbox" name="isAutoPush" lay-skin="switch" lay-filter="isAutoPush" lay-text="开启|关闭">
-        </div>
-        <div class="layui-form-mid layui-word-aux">开启后将在cookie发生改变时自动推送</div>
-      </div>
-
-      <div class="layui-hide" id='autoPushConfigView'>
-
-        <div class="layui-form-item">
-          <label class="layui-form-label">监控域名</label>
-          <div class="layui-input-block">
-            <input type="text" id="listenerDomain" name="listenerDomain" lay-reqText="监控的域名不能为空" autocomplete="off"
-              placeholder="请输入需要监控的域名" class="layui-input" lay-verType="tips">
-          </div>
-        </div>
-
-        <div class="layui-form-item" style="white-space:nowrap!important;">
-          <label class="layui-form-label">监控cookie</label>
-          <div class="layui-input-block fairy-tag-container">
-            <input type="text" class="fairy-tag-input cookieNames" autocomplete="off" value="">
-          </div>
-          <div class="layui-form-mid layui-word-aux" style="margin-left: 120px;">需要监控的cookie name集合，仅监控列表中的cookie发生变化时才推送，为空则域名下任意cookie发生变化都将推送，输入内容后按回车键添加name
-          </div>
-        </div>
-
-        <div class="layui-form-item" style="white-space:nowrap!important;">
-          <label class="layui-form-label">最短推送间隔</label>
-          <div class="layui-input-inline">
-            <input type="number" id="minPushInterval" name="minPushInterval" lay-reqText="推送间隔不能为空" autocomplete="off"
-              placeholder="请输入推送间隔时间" class="layui-input" lay-verType="tips" value="30">
-          </div>
-          <div class="layui-form-mid">秒</div>
-          <div class="layui-form-mid layui-word-aux">浏览器每设置一个cookie都会收到回调，推送间隔用于防止短时间内重复推送</div>
-        </div>
-
-      </div>
-      <div class="layui-form-item" style="text-align:center;">
+        <label class="layui-form-label">存放位置</label>
         <div class="layui-input-block">
-          <button type="button" class="layui-btn" lay-submit="" lay-filter="save">保存</button>
+          <select name="fieldLocation">
+            <option value="body" selected>body</option>
+            <option value="url">url</option>
+            <option value="header">header</option>
+          </select>
         </div>
       </div>
-    </form>
+
+  </div>
+  <div class="layui-form-item" style="text-align:center;">
+    <div class="layui-input-block">
+      <button type="button" class="layui-btn" lay-submit="" lay-filter="save" id="saveConfig">保存</button>
+    </div>
+  </div>
+  </form>
   </div>
   <script src="/vendor/layui/layui.js" charset="utf-8"></script>
   <script src="/vendor/notify/notify.js" charset="utf-8"></script>
-  <script src="/vendor/tldjs/tld.min.js" charset="utf-8"></script>
-  <script src="/vendor/inputTag/inputTag.js" charset="utf-8"></script>
   <script src="/js/options.js" charset="utf-8"></script>
 
 </body>

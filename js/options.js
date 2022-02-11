@@ -1,73 +1,52 @@
-layui.use(['form', 'notify','inputTag', 'jquery'], function () {
+layui.use(['notify', 'jquery'], function () {
   var form = layui.form,
     layer = layui.layer,
-    notify = layui.notify, 
-    $ = layui.jquery, 
-    inputTag = layui.inputTag;
-    
-    let cookieNames = [];
+    notify = layui.notify,
+    $ = layui.jquery;
 
   chrome.storage.sync.get(null, function (result) {
     form.val("configForm", result);
-    switchIsAutoPush(result.isAutoPush)
-    inputTag.render({
-      elem: '.cookieNames',
-      data: result.cookieNames,
-      onChange: function (value) {
-        cookieNames = value
-      }
+  });
+
+  var forbiddenRequestHeaders = [
+    "accept-charset",
+    "accept-encoding",
+    "access-control-request-headers",
+    "access-control-request-method",
+    "connection",
+    "content-length",
+    "content-transfer-encoding",
+    "cookie",
+    "cookie2",
+    "date",
+    "expect",
+    "host",
+    "keep-alive",
+    "origin",
+    "referer",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "upgrade",
+    "via"   ];
+
+  $("#saveConfig").click(function () {
+    let dataArray = $("#configForm").serializeArray();
+    let data = {}
+    $.each(dataArray, function () {
+      data[this.name] = this.value;
     });
-  });
-
-
-  let switchIsAutoPush = (isAutoPush)=>{
-    let autoPushConfig = $('#autoPushConfigView')
-    if (isAutoPush) {
-      autoPushConfig.removeClass('layui-hide')
-      autoPushConfig.find('input.layui-input').attr("lay-verify", "required")
-    } else {
-      autoPushConfig.addClass('layui-hide')
-      autoPushConfig.find('input.layui-input').removeAttr("lay-verify")
+    if(data.fieldLocation==="header"&&forbiddenRequestHeaders.includes(data.fieldName)){
+      layer.tips('header传参不能使用此字段名', '#fieldName');
+      return
     }
-  }
-
-  form.on('switch(isAutoPush)', function () {
-    switchIsAutoPush(this.checked)
-  });
-
-  form.on('select(cookieFormat)', function (data) {
-    switch (data.value) {
-      case 'string':
-        $('#cookieFormatTip').text('示例：a=1; b=2') 
-        break;
-      case 'array':
-        $('#cookieFormatTip').text('示例：["a=1","b=2"]')
-        break;
-      case 'object':
-        $('#cookieFormatTip').text('示例：{a:"1",b:"2"}')
-        break;
-      case 'jsonArray':
-        $('#cookieFormatTip').text('示例：[{domain:".abc.com",name:"a",value:"1"},{domain:".abc.com",name:"b",value:"2"}]')
-        break;
+    if(data.fieldLocation==="body"&&data.method==="GET"){
+      notify.error("使用GET方法的请求不能有body")
+      return
     }
-  });
-
-  $("#listenerDomain").blur(function () {
-    let value = $(this).val()
-    if (!value) return
-    let domain = tldjs.getDomain(value)
-    $(this).val(domain)
-    if (!domain) {
-      layer.tips('非法域名', '#listenerDomain');
-    }
-  })
-
-  form.on('submit(save)', function (data) {
-    data.field.isAutoPush = data.field.isAutoPush ? true : false
-    data.field.cookieNames = cookieNames
-    chrome.storage.sync.set(data.field, function () {
+    
+    chrome.storage.sync.set(data, function () {
       notify.success("保存成功")
     });
-    return false;
   });
 });
