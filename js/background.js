@@ -140,3 +140,55 @@ chrome.contextMenus.onClicked.addListener(async (itemData) => {
       break;
   }
 });
+
+var lastAutoPushTime
+
+let cookieListener = (changeInfo) => {
+  if (changeInfo.removed) {
+    //过滤删除cookie的操作
+    return
+  }
+  chrome.storage.sync.get(['listenerUrl', 'minPushInterval', 'cookieNames'], async (config) => {
+    if (!config.cookieNames.includes(changeInfo.cookie.name)) {
+      //不在监控的cookie名称之中，不推送
+      return
+    }
+    const topDomain = changeInfo.cookie.domain.split('.').slice(-2).join('.');
+    if (!config.listenerUrl.includes(topDomain)) {
+      //不在同一域名下，不推送
+      return
+    }
+    const timeInMs = Date.now()
+    if (lastAutoPushTime && (timeInMs - lastAutoPushTime) / 1000 < config.minPushInterval) {
+      //还没到最短间隔时长，不推送
+      return
+    }
+    lastAutoPushTime = timeInMs
+    setTimeout(function () {
+      //延迟3秒再推送(网站可能一次性设置了很多cookie，立即获取得到的cookie可能不完整)
+      chrome.cookies.getAll({
+        url: config.listenerUrl
+      },cookies=>pushCookies(cookies))
+  }, 3000);
+  });
+}
+
+chrome.storage.sync.get(['isAutoPush'], (result) => {
+  if (result.isAutoPush) {
+    console.log('开始监听cookie')
+    chrome.cookies.onChanged.addListener(cookieListener)
+  }
+})
+
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.isAutoPush) {
+    let newVal = changes.isAutoPush.newValue
+    if (newVal) {
+      console.log('开始监听cookie')
+      chrome.cookies.onChanged.addListener(cookieListener)
+    } else {
+      console.log('取消监听cookie')
+      chrome.cookies.onChanged.removeListener(cookieListener)
+    }
+  }
+})

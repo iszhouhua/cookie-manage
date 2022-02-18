@@ -1,7 +1,7 @@
 {
   "name": "Cookie推送工具",
   "description": "获取并推送指定网站的Cookie到服务器",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "background": {
     "service_worker": "js/background.js",
